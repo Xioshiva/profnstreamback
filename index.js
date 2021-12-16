@@ -12,14 +12,14 @@ const port = 8091
 app.listen(port);
 console.log('Server started');
 
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
 });
 
-app.get('/api', function (request, response){
-  console.log("HELLO MEN");
-  response.status(200).json("yo").end();
+app.get('/api', function(request, response) {
+    console.log("HELLO MEN");
+    response.status(200).json("yo").end();
 });
 
 
@@ -37,7 +37,6 @@ MongoClient.connect(url, function(err, db) {
     db.close();
   });
 }); 
-
 
 
 
@@ -62,3 +61,8 @@ let val = client.get('foo');
 val.then(i=>console.log(i))
 
 */
+var start = Date.now();
+setInterval(function() {
+    var delta = Date.now() - start; // milliseconds elapsed since start
+    output(Math.floor(delta / 1000)); // in seconds
+}, 1000); // update about every second
