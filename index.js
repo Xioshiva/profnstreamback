@@ -4,6 +4,7 @@ var cors = require('cors')
 
 const app = express()
 
+var payment = require('./modules/payment')
 
 //app.use(cors);
 
