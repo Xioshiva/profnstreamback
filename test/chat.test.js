@@ -1,5 +1,5 @@
 const assert = require('assert');
-const chat = require('../src/chat.js');
+const chat = require('../modules/chat.js');
 
 
 describe('Chat test', () => {
