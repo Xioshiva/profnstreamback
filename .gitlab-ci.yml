@@ -1,6 +1,7 @@
 build:cache:
   before_script:
     - apk add --update py-pip
+    - pip install pyrsistent==0.16.1
     - apk add --no-cache py3-setuptools && pip install docker-compose
   services:
     - docker:dind
