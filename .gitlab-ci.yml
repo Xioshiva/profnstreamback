@@ -17,6 +17,7 @@ build:cache:
   stage: build
   script:
     - cd ./cache/
+    - docekrd
     - docker-compose up
 
 build:test:
