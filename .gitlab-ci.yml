@@ -1,9 +1,7 @@
 build:cache:
-  # If you only need compose in a specific step definitely put this
-  # only in that step so it's not executed unnecessarily
   before_script:
-    # apk add --update py-pip
-    - apk add --no-cache py3-setuptools && pip install docker-compose
+    # apk add --no-cache py3-setuptools
+    - apk add --update py-pip && pip install docker-compose
   services:
     - docker:dind
   image: docker-compose:latest
