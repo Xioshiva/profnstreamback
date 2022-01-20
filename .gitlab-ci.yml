@@ -1,6 +1,6 @@
 build:cache:
   before_script:
-    # apk add --update py-pip
+    - apk add --update py-pip
     - apk add --no-cache py3-setuptools && pip install docker-compose
   services:
     - docker:dind
