@@ -13,13 +13,10 @@ services:
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
 
-before_script:
-  - docker version
-  - docker-compose version
-
 build:cache:
   stage: build
   script:
+    - cd ./cache/
     - docker-compose down
     - docker-compose build
     - docker-compose up
