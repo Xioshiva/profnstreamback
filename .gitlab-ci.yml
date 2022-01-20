@@ -1,17 +1,25 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+
+# Official docker compose image.
+image:
+  name: docker/compose:latest
+
+services:
+  - docker:dind
+
+before_script:
+  - docker version
+  - docker-compose version
+
 build:cache:
-  before_script:
-    - apk add --update py-pip
-    - pip install pyrsistent==0.16.1
-    - pip install "pytest<5"
-    - apk add --no-cache py3-setuptools && pip install docker-compose
-  services:
-    - docker:dind
-  image: docker/compose:latest
+  stage: build
   script:
-    - cd ./cache/
     - docker-compose down
     - docker-compose build
-    - docker-compose up
+    - docker-compose up tester-image
+
 
 build:test:
   image: node:latest
