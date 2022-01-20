@@ -1,6 +1,9 @@
 build:cache:
   image: docker/compose:latest
   script:
+    - sudo usermod -aG docker $USER
+    - sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+    - sudo service docker restart 
     - cd ./cache/
     - docker-compose down
     - docker-compose build
