@@ -54,8 +54,9 @@ function debitUser(idUser, amountOfCredits){
     }
     if(idUserIsValid(idUser) && amountOfCredits > 0) {
         try {
-            // call the API to debit the user
+            // call the private API to debit the user
             // update the database if needed
+            console.log("Client " + idUser + " has been debited " + amountOfCredits + " credits");
             return;
         } catch(e) {
             return "error while debiting the user";
