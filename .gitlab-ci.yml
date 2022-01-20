@@ -5,7 +5,7 @@ build:cache:
     - apk add --no-cache py3-pip && pip install docker-compose
   services:
     - docker:dind
-  image: docker/compose:latest
+  image: tmaier/docker-compose:latest
   script:
     - cd ./cache/
     - docker-compose down
