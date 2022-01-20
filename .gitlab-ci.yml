@@ -1,4 +1,6 @@
-image: node:latest
+image: 
+  name: node:latest
+  name: docker/compose:latest
 
 cache:
   paths:
@@ -8,6 +10,8 @@ test:
     script:
     - npm install
     - cd ./cache/
+    - docker-compose down
+    - docker-compose build
     - docker-compose up -d
     - cd ..
     - npm run test
