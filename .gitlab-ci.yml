@@ -4,7 +4,7 @@ build:cache:
     - apk add --update py-pip && pip install docker-compose
   services:
     - docker:dind
-  image: docker:latest
+  image: docker/compose:latest
   script:
     - cd ./cache/
     - docker-compose down
