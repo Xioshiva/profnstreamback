@@ -4,15 +4,6 @@ variables:
   # See https://github.com/docker-library/docker/pull/166
   DOCKER_TLS_CERTDIR: ""
 
-
-[[runners]]
-  executor = "docker"
-  [runners.docker]
-    privileged = true
-    [[runners.docker.services]]
-      name = "docker:19.03.13-dind"
-      command = ["--registry-mirror", "https://registry-mirror.example.com"]
-
 # Official docker compose image.
 image:
   name: docker/compose:latest
