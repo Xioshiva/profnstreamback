@@ -1,4 +1,4 @@
-module.exports =  {computeCreditsToDebit, debitUser}
+module.exports =  {computeCreditsToDebit, debitUser, getUserCredits}
 
 /**
  * Compute the number of credits to debit from the user account
@@ -63,5 +63,27 @@ function debitUser(idUser, amountOfCredits){
         } 
     } else {
         return "invalid idUser or amountOfCredits <= 0";
+    }
+}
+
+/**
+ * Return the number of credits depeding on the idUser
+ * @param {int} idUser the id of the user to debit
+ * @return {int}
+ */
+ function getUserCredits(idUser){
+    if(idUser === undefined) {
+        return "idUser is undefined";
+    }
+    if(idUserIsValid(idUser)) {
+        try {
+            nbCredits = 2; // call the private API to get user's credits
+            console.log("Client " + idUser + " has " + nbCredits + " credits");
+            return;
+        } catch(e) {
+            return "error while getting user's credits";
+        } 
+    } else {
+        return "invalid idUser";
     }
 }

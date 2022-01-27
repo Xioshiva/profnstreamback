@@ -42,4 +42,19 @@ describe('Compute credits to debit - Test', () => {
     it('should fail', () => {
         assert.equal(payment.debitUser(1,undefined), "idUser or amountOfCredits is undefined");
     });
+    it('should pass', () => {
+        assert.equal(payment.debitUser(1,3), undefined);
+    });
+});
+
+describe('Get credits from the idUser', () => {
+    it('should be undefined', () => {
+        assert.equal(payment.getUserCredits(undefined), "idUser is undefined");
+    });
+    it('should fail', () => {
+        assert.equal(payment.getUserCredits(-1), "invalid idUser");
+    });
+    it('should return 2', () => {
+        assert.equal(payment.getUserCredits(1), undefined);
+    });
 });
