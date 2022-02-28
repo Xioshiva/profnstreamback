@@ -1,65 +1,44 @@
-const express = require('express')
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
 
-var cors = require('cors')
-
-const app = express()
-
-var payment = require('./modules/payment')
-
-//app.use(cors);
-
-const port = 8090
-
-app.listen(port);
-console.log('Server started');
-
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
-
-app.get('/api', function (request, response){
-  console.log("HELLO MEN");
-  response.status(200).json("yo").end();
+const { Server } = require("socket.io");
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+  }
 });
 
 
-/*
-var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/mydb";
-MongoClient.connect(url, function(err, db) {
+app.get('/', (req, res) => {
+  res.send('<h1>Hello world</h1>');
+});
 
-  if (err) throw err;
-  var dbo = db.db("alexchien");
-  var query = { address: /^S/ };
-  dbo.collection("fruits").find({}).toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result);
-    db.close();
+io.on('connection', (socket) => {
+  console.log("Connected!");
+  socket.on('init', (roomID) => {
+    console.log("joined to " + roomID);
+    socket.join(roomID);
   });
-}); 
 
+  socket.on('chat message', (args)  => {
+    console.log("msg: " + args['msg'] + " roomID: " + args['roomID'] + " userID: " + args['userID']);
 
+    console.log("Sending");
+    socket.to(args['roomID']).emit('recieve message', ({"msg": args['msg'], "userID" : args['userID']}));
+    console.log("Sent");
+    //Add to cache
+  });
 
-
-
-//Cache
-
-const redis = require('redis');
-const client = redis.createClient({
-    host: 'localhost',
-    port: 6379,
+  console.log('a user connected');
 });
 
-client.on('error', err => {
-    console.log('Error ' + err);
+//On connection to socket -> add the socket to the correct room
+
+server.listen(3000, () => {
+  console.log('listening on *:3000');
 });
 
-client.connect();
-
-client.set('foo', 'TEST123456677883259');
-
-let val = client.get('foo');
-val.then(i=>console.log(i))
-
-*/
