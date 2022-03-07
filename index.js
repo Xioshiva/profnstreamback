@@ -27,10 +27,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (args)  => {
-    console.log("msg: " + args['msg'] + " roomID: " + args['roomID'] + " userID: " + args['userID']);
+    console.log("msg: " + args['msg'] + " roomID: " + args['roomID'] + " userID: " + args['userID'] + " question: " + args['question']);
 
     console.log("Sending");
-    socket.to(args['roomID']).emit('recieve message', ({"msg": args['msg'], "userID" : args['userID']}));
+    socket.to(args['roomID']).emit('recieve message', ({"msg": args['msg'], "userID" : args['userID'], "question": args['question']}));
     console.log("Sent");
     //Add to cache
   });
