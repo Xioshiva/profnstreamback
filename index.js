@@ -3,6 +3,8 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 
+var cors = require('cors')
+
 const { Server } = require("socket.io");
 const io = require("socket.io")(server, {
   cors: {
@@ -41,4 +43,5 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
+
 
