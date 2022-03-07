@@ -14,6 +14,8 @@ const io = require("socket.io")(server, {
   }
 });
 
+let socketList = {};
+
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello world</h1>');

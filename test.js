@@ -117,6 +117,17 @@ app.get('/cache', async (request, response) => {
     }
 });
 
+function updateCache(){
+    timerList.forEach(element => {
+        fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
+            if (err){
+                console.log(err);
+            } 
+            else {
+                console.log("ehoh")
+        }});
+    });
+}
 
 function eraseCache(userId,streamId){
 
