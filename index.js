@@ -40,20 +40,20 @@ class UserStreamEntity {
       this.streamId = streamId;
       this.time = time;
       this.timer = new timer(function() {
-        console.log("FINISH");
+        //console.log("FINISH");
         callback.call()
 
         //eraseCache(userId,streamId)
         //console.log(timerList)
         //delete timerList[timerList.findIndex(i => {return i.userId == userId && i.streamId == streamId})];
         //timerList = timerList.filter((a) => a)
-        console.log(timerList)
+        //console.log(timerList)
     }, time)
     }    
 }
 
 function test(){
-    console.log("EH OH")
+    //console.log("EH OH")
 }
 
 function timer(callback, delay) {
@@ -90,17 +90,39 @@ function existCache(userId,streamId){
     var obj = {
         table: []
      };
+
+     var res = 0
+     fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
+     if (err){
+        //console.log(err);
+     } 
+     else {
+        obj = JSON.parse(data); //now it an object
+        res = obj.table.findIndex(i => { return i.userId === userId && i.streamId === streamId});
+
+    }});
+    //console.log("res")
+    //console.log(res)
+    return (res != -1 && typeof res != 'undefined')
+
+}
+
+
+function existCache2(userId,streamId){
+    var obj = {
+        table: []
+     };
     var res
-    console.log(userId, streamId);  
+    //console.log(userId, streamId);  
     fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
     if (err){
-        console.log(err);
+        //console.log(err);
     } 
     else {
       obj = JSON.parse(data); //now it an object
       res = obj.table.findIndex(i => {
         return i.userId === userId && i.streamId === streamId});
-      console.log(res);
+      //console.log(res);
     }});
 
   if(typeof res === 'undefined'){
@@ -110,18 +132,21 @@ function existCache(userId,streamId){
 
 }
 
+// Récupère le temps restant d'un utilisateur pour un stream donné
 function getTimeFromCache(userId, streamId){
     var obj = {
         table: []
      };
+    var res = TRIALTIMEDURATION
     fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
         if (err){
-            console.log(err);
+            //console.log(err);
         } 
         else {
           obj = JSON.parse(data); //now it an object
+          res = obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})].time; //del some data
       }});
-      return obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})].time; //del some data
+    return res
 }
 
 
@@ -160,34 +185,32 @@ function updateCache(){
 }*/
 
 function eraseCache(userId,streamId){
-
+    
+    var obj = {
+        table: []
+     };
+     
     fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
         if (err){
             console.log(err);
         } else {
+            console.log("earse");
+            console.log("##############################");
         obj = JSON.parse(data); //now it an object
-
-
-        if(obj.table.length <= 1 ){
-            try {
-                fs.unlinkSync('cache.json');
+        console.log("Reading:")
+        console.log(obj)
+        fs.unlinkSync('cache.json');
             
-                console.log("File is deleted.");
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        else{
-            //console.log(obj.tab    git push --set-upstream origin adjusting-socketsle)
-            delete obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})]; //del some data
-            obj.table = obj.table.filter((a) => a)
-            json = JSON.stringify(obj); //convert it back to json
-            fs.writeFile(cachePath, json, 'utf8', function(error) {
-                console.log("File has been erased");
-              }); // write it back 
-        }
-
-
+        delete obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})]; //del some data
+        obj.table = obj.table.filter((a) => a)
+        console.log("Writing: ")
+        json = JSON.stringify(obj); //convert it back to json
+        console.log(json);
+        fs.writeFile(cachePath, json, 'utf8', function(error) {
+            //console.log(json);
+            console.log("File has been erased");
+        }); // write it back 
+        console.log("##############################");
     }});
 }
 
@@ -210,11 +233,25 @@ function writeCache(userId,streamId,time) {
                 if (err){
                     console.log(err);
                 } else {
+                    console.log("write")
+                    console.log("=============================");
                     obj = JSON.parse(data); //now it an object
+
+                    console.log(obj)
+                    console.log("ERASE:");
+                    delete obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})]; //del some data
+                    console.log(obj)
+                    obj.table = obj.table.filter((a) => a)
+                    console.log("Reading:");
+                    console.log(obj)
                     obj.table.push(entity); //add some data
                     json = JSON.stringify(obj); //convert it back to json
+                    console.log("Writing:");
+                    console.log(json)
                     fs.writeFile(cachePath, json, 'utf8', function(error) {
-                    console.log("File has been updated");
+                    //console.log(json)
+                    console.log("Wrote in cache!");
+                    console.log("=============================");
                   }); // write it back 
             }});
 
@@ -224,81 +261,127 @@ function writeCache(userId,streamId,time) {
             obj.table.push(entity)
             var json = JSON.stringify(obj);
             fs.writeFile(cachePath, json, 'utf8', function(error) {
-                console.log("File has been created");
-              })
+                console.log("Cache has been created");
+              })    
         }
     } catch(err) {
         console.error(err)
     }
 }
 
+
+
+function printCache(){
+    var obj = {
+        table: []
+     };
+    
+    try {
+        var fs = require('fs');
+        if (fs.existsSync(cachePath)) {
+            fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
+                if (err){
+                    console.log(err);
+                } else {
+                    obj = JSON.parse(data); //now it an object
+                    //console.log(obj)
+            }});
+
+        }    
+    }catch{
+        console.log(err)
+    }
+}
+
+function updateRemainingTime(userID, streamID){
+    var timerLeft = socketList[userID + "|" + streamID].timer.getTimeLeft();
+  
+    var entity = {
+        "userId": userID,
+        "streamId": streamID,
+        "time": timerLeft
+    }
+    console.log("ooooooooooooooooo");
+    //eraseCache(userID,streamID);
+    printCache();
+    writeCache(userID,streamID,timerLeft);
+    printCache();
+    console.log("ooooooooooooooooo");
+}
+
+
+function getRemainingTime(userID, streamID){
+    //If user-stream combo doesn´t exist in cache -> return TRIALTIMEDURATION
+    let remainingTime = TRIALTIMEDURATION;
+    if(existCache2(userID, streamID)){
+        //console.log("userID/streamID already exist in cache")
+        remainingTime = getTimeFromCache(userID, streamID);
+    }
+    return remainingTime;
+}
+
 app.listen(8080);
 console.log('Server started');
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello world</h1>');
 });
 
+//This is called by the frontend whenever the page is loaded
+//in order to know the tie remaining
+app.get('/time/:stream /:user', (res,req) =>{
+    //Get the time remaining for the user. 
+    res.send(getRemainingTime(req.params.user, req.params.stream));
+});
+
+
 io.on('connection', (socket) => {
 
   var roomID = "";
   var userID = "";
-  console.log("Connected!");
+  //console.log("Connected!");
   socket.on('init', (args) => {
     roomID = args['roomID'];
     userID = args['userID'];
-    console.log("joined to " + args['roomID']);
+    //console.log("joined to " + args['roomID']);
     socket.join(args['roomID']);
     // key is userID + "|" + roomID
-    let remainingTime = TRIALTIMEDURATION;
-    console.log(existCache(args['userID'], args['roomID']));
-    if(existCache(args['userID'], args['roomID'])){
-        remainingTime = getTimeFromCache(args['userID'], args['roomID']);
-        console.log("Loaded");
-    }
+
+    let remainingTime = getRemainingTime(userID, roomID)
 
     socketList[args['userID'] + "|" + args['roomID']] = new UserStreamEntity(args['userID'], args['roomID'],remainingTime, socket, i =>
       {
-        console.log("Done");
+        //console.log("Done");
         socket.disconnect();
-        delete socketList[args['userID'] + "|" + args['roomID']];
-        console.log(socketList);
+        //delete socketList[args['userID'] + "|" + args['roomID']];
       });
-      addTimer(socketList[args['userID'] + "|" + args['roomID']]);
+
+    //console.log("add new Timer")
+    if(!existCache2(userID, roomID)){
+        //console.log("HELLO CACHE IS NOT EXIST");
+        addTimer(socketList[userID + "|" +roomID]);
+    }
   });
 
   socket.on('chat message', (args) => {
-    console.log("msg: " + args['msg'] + " roomID: " + args['roomID'] + " userID: " + args['userID'] + " question: " + args['question']);
-
-    console.log("Sending");
     socket.to(args['roomID']).emit('recieve message', ({ "msg": args['msg'], "userID": args['userID'], "question": args['question'] }));
-    console.log("Sent");
-    //Add to cache
   });
 
   socket.on('disconnect', (reason) =>{
-    console.log("heyooo");
-    console.log(socketList);
-
-    console.log(userID + "|" + roomID);
+      
+    //console.log(userID + "|" + roomID);
     socketList[userID + "|" + roomID].timer.pause();
-    console.log("Paused!");
-    delete socketList[userID + "|" + roomID];
-    /*for (var key in socketList){
+    //console.log("Paused!");
+    //console.log(socketList);
+    updateRemainingTime(userID,roomID);
 
+    delete socketList[userID + "|" + roomID];
+    
+    //Replace userID roomID : time by new time which is
+
+
+    /*for (var key in socketList){
         if(JSON.stringify([key].socket) === JSON.stringify(socket)){
             socketList[key].pause()
             console.log("Paused!");
@@ -307,7 +390,7 @@ io.on('connection', (socket) => {
     socket.disconnect();
   });
 
-  console.log('a user connected');
+  //console.log('a user connected');
 });
 
 //On connection to socket -> add the socket to the correct room
@@ -315,5 +398,3 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
-
-
