@@ -94,12 +94,11 @@ function existCache(userId,streamId){
      var res = 0
      fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
      if (err){
-        //console.log(err);
+        console.log(err);
      } 
      else {
         obj = JSON.parse(data); //now it an object
         res = obj.table.findIndex(i => { return i.userId === userId && i.streamId === streamId});
-
     }});
     //console.log("res")
     //console.log(res)
@@ -107,53 +106,30 @@ function existCache(userId,streamId){
 
 }
 
-
-function existCache2(userId,streamId){
-    var obj = {
-        table: []
-     };
-    var res
-    //console.log(userId, streamId);  
-    fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
-    if (err){
-        //console.log(err);
-    } 
-    else {
-      obj = JSON.parse(data); //now it an object
-      res = obj.table.findIndex(i => {
-        return i.userId === userId && i.streamId === streamId});
-      //console.log(res);
-    }});
-
-  if(typeof res === 'undefined'){
-    return false;
-  }
-  return res  != -1 ; //del some data
-
-}
-
 // Récupère le temps restant d'un utilisateur pour un stream donné
-function getTimeFromCache(userId, streamId){
+async function getTimeFromCache(userId, streamId){
     var obj = {
         table: []
      };
-    var res = TRIALTIMEDURATION
-    fs.readFile(cachePath, 'utf8', function readFileCallback(err, data){
-        if (err){
-            //console.log(err);
-        } 
-        else {
-          obj = JSON.parse(data); //now it an object
-          res = obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})].time; //del some data
-      }});
-    return res
+
+    try{
+        let data = fs.readFileSync(cachePath, 'utf8');
+        obj = JSON.parse(data); //now it an object
+        console.log(obj)
+        return obj.table[obj.table.findIndex(i => {
+            return i.userId == userId && i.streamId == streamId
+          })].time; //del some data
+    }catch{
+        console.log(err);
+    }
+
 }
 
 
 // newEntry : UserStreamEntity 
 function addTimer(newEntry){
   timerList.push(newEntry);
-  writeCache(newEntry.userId,newEntry.streamId,newEntry.time)
+  writeCache(newEntry.userId,newEntry.streamId,newEntry.timer.getTimeLeft())
 }
 /*
 app.post('/cache', async (request, response) => {
@@ -237,7 +213,7 @@ function writeCache(userId,streamId,time) {
                     console.log("=============================");
                     obj = JSON.parse(data); //now it an object
 
-                    console.log(obj)
+                    
                     console.log("ERASE:");
                     delete obj.table[obj.table.findIndex(i => {return i.userId == userId && i.streamId == streamId})]; //del some data
                     console.log(obj)
@@ -304,20 +280,25 @@ function updateRemainingTime(userID, streamID){
     console.log("ooooooooooooooooo");
     //eraseCache(userID,streamID);
     printCache();
+    console.log("TIME LEST")
+    console.log(timerLeft)
     writeCache(userID,streamID,timerLeft);
     printCache();
     console.log("ooooooooooooooooo");
 }
 
 
-function getRemainingTime(userID, streamID){
+async function getRemainingTime(userID, streamID){
     //If user-stream combo doesn´t exist in cache -> return TRIALTIMEDURATION
-    let remainingTime = TRIALTIMEDURATION;
-    if(existCache2(userID, streamID)){
+    if(existCache(userID, streamID)){
+        console.log("ALREADY EXIIIIIIST ?")
         //console.log("userID/streamID already exist in cache")
-        remainingTime = getTimeFromCache(userID, streamID);
+        let remainingTime = await getTimeFromCache(userID, streamID);
+        console.log(remainingTime);
+        return remainingTime;
+    }else{
+        return TRIALTIMEDURATION;
     }
-    return remainingTime;
 }
 
 app.listen(8080);
@@ -358,7 +339,7 @@ io.on('connection', (socket) => {
       });
 
     //console.log("add new Timer")
-    if(!existCache2(userID, roomID)){
+    if(!existCache(userID, roomID)){
         //console.log("HELLO CACHE IS NOT EXIST");
         addTimer(socketList[userID + "|" +roomID]);
     }
