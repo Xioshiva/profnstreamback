@@ -34,7 +34,7 @@ const io = require("socket.io")(server, {
 });
 
 
-const TRIALTIMEDURATION = 20 * 10;
+const TRIALTIMEDURATION = 5*60*1000;
 
 
 class UserStreamEntity {
@@ -98,11 +98,17 @@ function timer(callback, delay) {
 
 //This is called by the frontend whenever the page is loaded
 //in order to know the tie remaining
-app.get('/time/:stream /:user', (res,req) =>{
-  //Get the time remaining for the user. 
-  console.log("Hey");
-  res.send(getRemainingTime(req.params.user, req.params.stream));
-});
+app.get('/timer/:stream/:user', (req,res) =>{
+  //Get the time remaining for the user.
+  console.log(req.params.user)
+  getRemainingTime(req.params.user, req.params.stream)
+    .then(a=>{
+      if(a<0){
+        a = 0;
+      }
+      res.json({"timer": a});
+      res.status(200).end();
+});});
 
 
 
@@ -123,7 +129,8 @@ async function getTimeFromCache(userID, streamID){
 async function getRemainingTime(userID, streamID){
     //If user-stream combo doesn´t exist in cache -> return TRIALTIMEDURATION
     return existCache(userID + "|" + streamID).then(a=> {
-      if(a){
+      console.log("a = " + a)
+      if(a == 1){
         console.log("Get Remaining Time -> Si le timer UserID|StreamID Exist ")
         //console.log("userID/streamID already exist in cache")
         let remainingTime = getTimeFromCache(userID, streamID);
@@ -141,11 +148,9 @@ async function getRemainingTime(userID, streamID){
 
 async function existCache(value){
   var client = redis.createClient();
-  
   return client.connect().then( a =>{
     return client.exists(value);
     });
-
 }
 
 async function add(key,timer) {
