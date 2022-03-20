@@ -3,9 +3,8 @@ const express = require('express'),
     User = require('../database/Schema').User;
 
 router.get('/',
-    require('connect-ensure-login').ensureLoggedIn(),
     (req, res) => {
-
+        console.log("YEAH HELLOOOOO MEEENNNN");
         if(req.query.username){
             User.findOne({
                 username : req.query.username

@@ -13,4 +13,3 @@ if(document.getElementById('root')){
         document.getElementById('root')
     );
 }
-

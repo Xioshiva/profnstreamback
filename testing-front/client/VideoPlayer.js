@@ -22,6 +22,7 @@ export default class VideoPlayer extends React.Component {
                 username: this.props.match.params.username
             }
         }).then(res => {
+            console.log("BRUUUUUH")
             this.setState({
                 stream: true,
                 videoJsOptions: {
@@ -36,7 +37,7 @@ export default class VideoPlayer extends React.Component {
             }, () => {
                 this.player = videojs(this.videoNode, this.state.videoJsOptions, function onPlayerReady() {
                     //console.log('onPlayerReady', this)
-                    console.log('stream_key: ' + res.data.stream_key)
+                    console.log('\n -> stream_key: ' + res.data.stream_key)
                 });
             });
         })
