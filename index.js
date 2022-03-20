@@ -2,9 +2,11 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-
+var cors = require('cors')
 const fs = require('fs');
 const bodyParser = require('body-parser');
+
+app.use(cors());
 
 app.use(express.static('../frontend'));
 app.use(bodyParser.json());
@@ -98,6 +100,7 @@ function timer(callback, delay) {
 //in order to know the tie remaining
 app.get('/time/:stream /:user', (res,req) =>{
   //Get the time remaining for the user. 
+  console.log("Hey");
   res.send(getRemainingTime(req.params.user, req.params.stream));
 });
 
