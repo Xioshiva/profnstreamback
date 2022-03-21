@@ -40,6 +40,7 @@ const io = require("socket.io")(server, {
 
 const TRIALTIMEDURATION = 5*60*1000;
 
+const STREAMCOST = 10;
 
 class UserStreamEntity {
     constructor(userId, streamId,time,socketId , callback) {
@@ -114,6 +115,36 @@ app.get('/timer/:stream/:user', (req,res) =>{
       res.status(200).end();
 });});
 
+
+
+app.get('/stream/get/:profID/:userID', (req, res) => {
+  getRemainingMoney(req.params.userID)
+    .then(a => {
+      if(a < STREAMCOST){
+        res.status(402).end();
+      }else if(a == -1){
+        res.status(404).end();
+      }else{
+        res.json("url": )
+        res.status(200).end();
+      }
+    });
+});
+
+async function getRemainingMoney(userID){
+  return existDB(userID).then(a => {
+    if(a){
+      let remainingMoney = getMoneyFromDB(userID);
+      console.log("remaining money = " + remainingMoney);
+      return remainingMoney;
+    }
+    return -1;
+  });
+}
+
+async function existDB(userID){
+  return (userID != null) ? true : false;
+}
 
 
 
