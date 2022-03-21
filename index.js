@@ -125,7 +125,7 @@ app.get('/stream/get/:profID/:userID', (req, res) => {
       }else if(a == -1){
         res.status(404).end();
       }else{
-        res.json("url": )
+        res.json({"amount": a});
         res.status(200).end();
       }
     });
@@ -134,7 +134,7 @@ app.get('/stream/get/:profID/:userID', (req, res) => {
 async function getRemainingMoney(userID){
   return existDB(userID).then(a => {
     if(a){
-      let remainingMoney = getMoneyFromDB(userID);
+      let remainingMoney = 15;//getMoneyFromDB(userID);
       console.log("remaining money = " + remainingMoney);
       return remainingMoney;
     }
@@ -146,7 +146,9 @@ async function existDB(userID){
   return (userID != null) ? true : false;
 }
 
-
+async function getMoneyFromDB(userID){
+  return 15;
+}
 
 
 async function writeCache(userID,streamID,time) {
