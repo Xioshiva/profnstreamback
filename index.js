@@ -116,6 +116,9 @@ app.get('/timer/:stream/:user', (req,res) =>{
 });});
 
 
+////////////////////////////////////////////////////////
+
+/* Route pour le front */ 
 
 app.get('/stream/get/:profID/:userID', (req, res) => {
   getRemainingMoney(req.params.userID)
@@ -126,6 +129,15 @@ app.get('/stream/get/:profID/:userID', (req, res) => {
         res.status(404).end();
       }else{
         res.json({"amount": a});
+        res.status(200).end();
+      }
+    });
+  getStreamURL(req.params.profID)
+    .then(a => {
+      if(a == null){
+        res.status(404).end();
+      }else{
+        res.json({"url": a});
         res.status(200).end();
       }
     });
@@ -150,6 +162,34 @@ async function getMoneyFromDB(userID){
   return 15;
 }
 
+async function getStreamURL(profID){
+  return existDB(profID).then(a => {
+    let url = "http://127.0.0.1:7002/live/bruh.m3u8"; //getURLFromDB(profID);
+    console.log("stream url: " + url);
+    return url;
+  });
+}
+
+async function getURLFromDB(profID){
+  return 0;
+}
+
+//////////////////////////////////////////////////////
+
+/* Route pour le liveGo */
+
+app.post('/stream/add/:profID/:URL', (req, res) => {
+  addStream(req.params.profID, req.params.URL)
+    .then(a => {
+
+    })
+});
+
+async function addStream(profID, URL){
+  
+}
+
+//////////////////////////////////////////////////////
 
 async function writeCache(userID,streamID,time) {
 
