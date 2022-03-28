@@ -178,14 +178,14 @@ async function getURLFromDB(profID){
 
 /* Route pour le liveGo */
 
-app.post('/stream/:profID', (req, res) => {
+app.post('/stream/add/:profID', (req, res) => {
   addStream(req.params.profID, req.params.URL)
     .then(a => {
       console.log(req.params.profID + "'s stream added!");
     })
 });
 
-app.delete('/stream/:profID', (req, res) => {
+app.post('/stream/remove/:profID', (req, res) => {
   removeStream(req.params.profID, req.params.URL)
     .then(a => {
       console.log(req.params.profID + "'s stream removed!");
