@@ -1,4 +1,4 @@
-module.exports =  {computeCreditsToDebit, debitUser, getUserCredits}
+module.exports =  {computeCreditsToDebit, debitUser, getUserCredits, updatePayment, checkPayment}
 
 /**
  * Compute the number of credits to debit from the user account
@@ -74,6 +74,37 @@ function debitUser(idUser, amountOfCredits){
     }
 }
 
+/**
+ * Update the DB as we want to know if a user paid for a specific stream at any time
+ * @param {int} idUser the id of the user to debit
+ * @param {int} idStream the id of the stream
+ * @return {void}
+ */
+function updatePayment(idUser, idStream){
+    if(idUserIsValid(idUser) && idStreamIsValid(idStream)){
+        paymentStream.push({
+            userID: idUser, streamID: idStream
+        });
+    }
+    console.log(paymentStream);
+}
+
+/**
+ * Given a userID and a streamID, check if the user has paid for the stream
+ * @param {int} idUser the id of the user
+ * @param {int} idStream the id of the stream
+ * @return {boolean} true if he aleready paid, else false
+ */function checkPayment(idUser, idStream){
+    if(idUserIsValid(idUser) && idStreamIsValid(idStream)){
+        if(filterArray(paymentStream, 'userID', idUser)[0] !== undefined && 
+        filterArray(paymentStream, 'streamID', idStream)[0] !== undefined){
+            console.log(filterArray(paymentStream, 'userID', idUser)[0])
+            console.log(filterArray(paymentStream, 'streamID', idStream)[0])
+            return true;
+        }
+    }
+    return false;
+}
 
 /**
  * Return the array matching the params
@@ -94,17 +125,20 @@ const userList = [
     {id: 2, name:"alexey", credits: 3},
     {id: 3, name:"antoine", credits: 2},
     {id: 4, name:"gustavo", credits: 1},
-    {id: 5, name:"trung", credits: 0}    
+    {id: 5, name:"trung", credits: 0},
+    {id: 10, name:"testman", credits: 14}
 ];
 
 const streamList = [
     {id: 0, name:"orestis"},
     {id: 1, name:"stephane"},
-    {id: 2, name:"yacine"},
+    {id: 2, name:"yassin"},
     {id: 3, name:"nabil"},
     {id: 4, name:"paul"},
     {id: 5, name:"adrient"}    
 ];
+
+var paymentStream = []
 
 /* -- MAIN -- */
 

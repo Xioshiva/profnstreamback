@@ -21,10 +21,10 @@ app.use(bodyParser.urlencoded({
 var socketList = {};
 var timerList = [];
 
-app.get('/payment/:stream/:user', (req, res) => {
+app.get('/payment/debit/:stream/:user', (req, res) => {
   // we suppose we don't need any timestamp to compute the number of credits to debit
   if(payment.debitUser(parseInt(req.params.user), payment.computeCreditsToDebit("timestamp", parseInt(req.params.user), parseInt(req.params.stream))) == 0){
-    console.log();
+    payment.updatePayment(parseInt(req.params.user), parseInt(req.params.stream));
     res.json({
       "credits": payment.getUserCredits(parseInt(req.params.user))
     });
@@ -36,6 +36,40 @@ app.get('/payment/:stream/:user', (req, res) => {
     res.status(200).end();
   }
 });
+
+app.get('/payment/credits/:user', (req, res) => {
+  // we suppose we don't need any timestamp to compute the number of credits to debit
+  var credits = payment.getUserCredits(parseInt(req.params.user)); 
+  if(credits >= 0){
+    res.json({
+      "credits": credits
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "credits": -1
+    });
+    res.status(200).end();
+  }
+});
+
+app.get('/payment/check/:stream/:user', (req, res) => {
+  // we suppose we don't need any timestamp to compute the number of credits to debit
+  output = payment.checkPayment(parseInt(req.params.user), parseInt(req.params.stream));
+  console.log("ouela: " + output);
+  if(output){
+    res.json({
+      "credits": true
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "credits": false
+    });
+    res.status(200).end();
+  }
+});
+
 
 const cachePath = './cache.json'
 
