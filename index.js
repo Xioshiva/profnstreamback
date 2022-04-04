@@ -21,6 +21,26 @@ app.use(bodyParser.urlencoded({
 var socketList = {};
 var timerList = [];
 
+app.get('/banned/add/:stream/:user', (req, res) => {
+  payment.updateBannedUsers(parseInt(req.params.user), parseInt(req.params.stream));
+  res.status(200).end();
+});
+
+app.get('/banned/check/:stream/:user', (req, res) => {
+  output = payment.checkUserBanned(parseInt(req.params.user), parseInt(req.params.stream));
+  if(output){
+    res.json({
+      "result": true
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "result": false
+    });
+    res.status(200).end();
+  }
+});
+
 app.get('/payment/debit/:stream/:user', (req, res) => {
   // we suppose we don't need any timestamp to compute the number of credits to debit
   if(payment.debitUser(parseInt(req.params.user), payment.computeCreditsToDebit("timestamp", parseInt(req.params.user), parseInt(req.params.stream))) == 0){
@@ -56,7 +76,6 @@ app.get('/payment/credits/:user', (req, res) => {
 app.get('/payment/check/:stream/:user', (req, res) => {
   // we suppose we don't need any timestamp to compute the number of credits to debit
   output = payment.checkPayment(parseInt(req.params.user), parseInt(req.params.stream));
-  console.log("ouela: " + output);
   if(output){
     res.json({
       "credits": true
@@ -68,6 +87,13 @@ app.get('/payment/check/:stream/:user', (req, res) => {
     });
     res.status(200).end();
   }
+});
+
+app.get('/credential/:user', (req, res) => {
+  res.json({
+    "credential": payment.isUserProf(parseInt(req.params.user))
+  });
+  res.status(200).end();
 });
 
 
