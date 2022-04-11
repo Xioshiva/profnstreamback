@@ -17,8 +17,6 @@ app.use(bodyParser.urlencoded({
 
 var redis = require('redis');
 
-
-
 var socketList = {};
 var timerList = [];
 
@@ -37,6 +35,10 @@ const io = require("socket.io")(server, {
   }
 });
 
+
+
+
+var profStreamDict = [];
 
 const TRIALTIMEDURATION = 5*60*1000;
 
@@ -63,6 +65,7 @@ class UserStreamEntity {
 function test(){
     //console.log("EH OH")
 }
+
 
 function timer(callback, delay) {
     var id, started, remaining = delay, running
@@ -121,57 +124,71 @@ app.get('/timer/:stream/:user', (req,res) =>{
 /* Route pour le front */ 
 
 app.get('/stream/get/:profID/:userID', (req, res) => {
-  getRemainingMoney(req.params.userID)
-    .then(a => {
-      if(a < STREAMCOST){
-        res.status(402).end();
-      }else if(a == -1){
-        res.status(404).end();
-      }else{
-        res.json({"amount": a});
-        res.status(200).end();
-      }
-    });
-  getStreamURL(req.params.profID)
-    .then(a => {
-      if(a == null){
-        res.status(404).end();
-      }else{
-        res.json({"url": a});
-        res.status(200).end();
-      }
-    });
+  console.log("YOOOO");
+  var r = getRemainingMoney(req.params.userID)
+
+  if(r < STREAMCOST){
+    res.status(402).end();
+  }
+  console.log("NO RESPONSE");
+  let a = getStreamURL(req.params.profID);
+  console.log("SET STREAM");
+  console.log(a);
+  if(a == null){
+    res.status(408).end();
+  }else{
+    res.json({"url": a});
+    res.status(200).end();
+  }
+ 
 });
 
-async function getRemainingMoney(userID){
-  return existDB(userID).then(a => {
-    if(a){
-      let remainingMoney = 15;//getMoneyFromDB(userID);
+function getRemainingMoney(userID){
+  if(existDB(userID)){
+      let remainingMoney = getMoneyFromDB(userID);
       console.log("remaining money = " + remainingMoney);
       return remainingMoney;
-    }
-    return -1;
-  });
+  }else{
+    return S
+  }
 }
 
-async function existDB(userID){
+function existDB(userID){
   return (userID != null) ? true : false;
 }
 
-async function getMoneyFromDB(userID){
+function getMoneyFromDB(userID){
   return 15;
 }
 
-async function getStreamURL(profID){
-  return existDB(profID).then(a => {
-    let url = "http://127.0.0.1:7002/live/bruh.m3u8"; //getURLFromDB(profID);
-    console.log("stream url: " + url);
-    return url;
-  });
+function getStreamURL(profID){
+  if(existDB(profID)){
+    console.log(profStreamDict.length);
+    return profStreamDict.forEach(a => {
+      console.log("EHOH");
+      console.log(profID)
+      console.log(a);
+      console.log(a['value']);
+      if(a['key'] == profID){
+        console.log("TETO");
+        return a['value']
+      }else{
+        return null
+      }
+    })
+  }  
+  //console.log("stream url: " + a["value"]);
+
+  //return url;
+
 }
 
 async function getURLFromDB(profID){
-  return 0;
+  return profStreamDict.forEach(a => {
+    if (a['key'] == profID){
+      return a['value'];
+    }
+  })
 }
 
 //////////////////////////////////////////////////////
@@ -179,27 +196,30 @@ async function getURLFromDB(profID){
 /* Route pour le liveGo */
 
 app.post('/stream/add/:profID', (req, res) => {
-  addStream(req.params.profID, req.params.URL)
+  console.log("ADDDDDDDDDDDDdddd");
+  addStreamFromDB(req.params.profID, "/live/" + req.params.profID + ".m3u8"  )
     .then(a => {
       console.log(req.params.profID + "'s stream added!");
     })
 });
 
 app.post('/stream/remove/:profID', (req, res) => {
-  removeStream(req.params.profID, req.params.URL)
+  console.log("REMOOOOOOOOOOOOOOOOOOOOOOVE");
+  removeStreamFromDB(req.params.profID, req.params.URL)
     .then(a => {
       console.log(req.params.profID + "'s stream removed!");
     })
 });
 
 
-async function addStream(profID, URL){
-  
+async function addStreamFromDB(profID, URL){
+  profStreamDict.push({key: profID, value: URL});
 }
 
 
-async function removeStream(profID, URL){
-  
+
+async function removeStreamFromDB(profID, URL){
+  delete profStreamDict[profStreamDict.findIndex({key: profID, value: URL})];
 }
 
 //////////////////////////////////////////////////////
@@ -219,16 +239,16 @@ async function getTimeFromCache(userID, streamID){
 async function getRemainingTime(userID, streamID){
     //If user-stream combo doesn´t exist in cache -> return TRIALTIMEDURATION
     return existCache(userID + "|" + streamID).then(a=> {
-      console.log("a = " + a)
+      //console.log("a = " + a)
       if(a == 1){
-        console.log("Get Remaining Time -> Si le timer UserID|StreamID Exist ")
+        //console.log("Get Remaining Time -> Si le timer UserID|StreamID Exist ")
         //console.log("userID/streamID already exist in cache")
         let remainingTime = getTimeFromCache(userID, streamID);
         console.log("remaining time = " + remainingTime);
         return remainingTime;
     }else{
 
-      console.log("durée max")
+      //console.log("durée max")
         return TRIALTIMEDURATION;
     }
 
@@ -254,7 +274,7 @@ async function add(key,timer) {
 
     });
 
-  console.log("heu")
+  //console.log("heu")
 }
 
 
@@ -288,21 +308,20 @@ io.on('connection', (socket) => {
 
 
     socket.on('init', (args) => {
-      console.log("eheh")
+      //console.log("eheh")
       roomID = args['roomID'];
       userID = args['userID'];
       socket.join(args['roomID']);
 
-
       getRemainingTime(userID, roomID).then( a => {
 
         let remainingTime = a;
-        console.log("remaining : " + remainingTime)
+        //console.log("remaining : " + remainingTime)
 
         if(remainingTime <= 0){
           socketList[args['userID'] + "|" + args['roomID']] = new UserStreamEntity(args['userID'], args['roomID'],remainingTime, socket, i =>
           {
-            console.log("Timer Ended");
+            //console.log("Timer Ended");
             socket.disconnect();
           });
           console.log("Detected negative or 0 time!");
@@ -310,11 +329,11 @@ io.on('connection', (socket) => {
         }else{
           socketList[args['userID'] + "|" + args['roomID']] = new UserStreamEntity(args['userID'], args['roomID'],remainingTime, socket, i =>
           {
-            console.log("Timer Ended");
+            //console.log("Timer Ended");
             socket.disconnect();
           });
-
-          console.log(socketList[userID + "|" +roomID]);
+          
+          /*console.log(socketList[userID + "|" +roomID]);*/
           existCache(userID + "|"+ roomID).then(b => {
             if(b == 0){
             addTimer(socketList[userID + "|" +roomID]);
@@ -337,7 +356,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', (reason) =>{
       //socketList[userID + "|" + roomID].timer.pause();
-      console.log(socketList[userID + "|" + roomID])
+      //console.log(socketList[userID + "|" + roomID])
       addTimer(socketList[userID + "|" + roomID]).then( o => {
         console.log("HELOO MY NAME IS CHIKCHIKASLIMSHADY")
         console.log(socketList[userID + "|" + roomID])
