@@ -116,18 +116,34 @@ app.get('/timer/:stream/:user', (req, res) => {
 });
 
 
+function getStreamURL(profID) {
+  if (existDB(profID)) {
+    let res;
+    profStreamDict.forEach(a => {
+      //console.log(a, "and", profID);
+      if (a['key'] == profID) {
+        console.log(a['key'], "and", profID, "makes", a['value']);
+        res = a['value'];
+    }});
+    return res;
+  }else{
+    return "OI"
+  }
+}
+
+
 ////////////////////////////////////////////////////////
 
 /* Route pour le front */
 
 app.get('/stream/get/:profID/:userID', (req, res) => {
-  console.log("HELLOOLOLOLOLOLOLOLO");
   var r = getRemainingMoney(req.params.userID)
 
   if (r < STREAMCOST) {
     res.status(402).end();
   }
   let a = getStreamURL(req.params.profID);
+  console.log("VAL: " + a);
   if (a == null) {
     res.status(408).end();
   } else {
@@ -154,17 +170,6 @@ function getMoneyFromDB(userID) {
   return 15;
 }
 
-function getStreamURL(profID) {
-  if (existDB(profID)) {
-    return profStreamDict.forEach(a => {
-      console.log(a);
-      if (a['key'] == profID) {
-        return a['value']
-      }})
-  }else{
-    return "OI"
-  }
-}
 
 function getURLFromDB(profID) {
   return profStreamDict.forEach(a => {
