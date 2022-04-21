@@ -74,6 +74,7 @@ function timer(callback, delay) {
     if (delay >= 0) {
       id = setTimeout(callback, remaining)
     }
+  }
 
   }
 
@@ -97,9 +98,6 @@ function timer(callback, delay) {
   this.start()
 
 }
-
-
-
 
 //This is called by the frontend whenever the page is loaded
 //in order to know the tie remaining
@@ -413,6 +411,7 @@ io.on('connection', (socket) => {
 app.listen(8080);
 console.log('Server started');
 
+//On connection to socket -> add the socket to the correct room
 
 //On connection to socket -> add the socket to the correct room
 
