@@ -30,6 +30,7 @@ function idUserIsValid(idUser){
     return filterArray(userList, 'idUser', idUser).length > 0 || filterArray(streamList, 'idUser', idUser).length > 0;
 }
 
+
 /**
  * Return a boolean as the id given exists in the database
  * @param {int} idStream the id of the stream 
@@ -112,7 +113,6 @@ function checkPayment(idUser, idStream){
  */function isUserProf(userID){
     return filterArray(streamList, 'idUser', userID)[0] !== undefined;
 }
-
 
 /**
  * Update the DB as we want to know if a user has been banned of a specific stream at any time
