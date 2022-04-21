@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-
+const payment = require('./modules/payment')
 var redis = require('redis');
 
 var socketList = {};
@@ -150,6 +150,81 @@ app.get('/stream/get/:profID/:userID', (req, res) => {
     res.status(200).end();
   }
 
+});
+
+app.get('/banned/add/:stream/:user', (req, res) => {
+  payment.updateBannedUsers(parseInt(req.params.user), parseInt(req.params.stream));
+  res.status(200).end();
+});
+
+app.get('/banned/check/:stream/:user', (req, res) => {
+  output = payment.checkUserBanned(parseInt(req.params.user), parseInt(req.params.stream));
+  if(output){
+    res.json({
+      "result": true
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "result": false
+    });
+    res.status(200).end();
+  }
+});
+
+app.get('/payment/debit/:stream/:user', (req, res) => {
+  // we suppose we don't need any timestamp to compute the number of credits to debit
+  if(payment.debitUser(parseInt(req.params.user), payment.computeCreditsToDebit("timestamp", parseInt(req.params.user), parseInt(req.params.stream))) == 0){
+    payment.updatePayment(parseInt(req.params.user), parseInt(req.params.stream));
+    res.json({
+      "credits": payment.getUserCredits(parseInt(req.params.user))
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "credits": -1
+    });
+    res.status(200).end();
+  }
+});
+
+app.get('/payment/credits/:user', (req, res) => {
+  // we suppose we don't need any timestamp to compute the number of credits to debit
+  var credits = payment.getUserCredits(parseInt(req.params.user)); 
+  if(credits >= 0){
+    res.json({
+      "credits": credits
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "credits": -1
+    });
+    res.status(200).end();
+  }
+});
+
+app.get('/payment/check/:stream/:user', (req, res) => {
+  // we suppose we don't need any timestamp to compute the number of credits to debit
+  output = payment.checkPayment(parseInt(req.params.user), parseInt(req.params.stream));
+  if(output){
+    res.json({
+      "credits": true
+    });
+    res.status(200).end();
+  } else {
+    res.json({
+      "credits": false
+    });
+    res.status(200).end();
+  }
+});
+
+app.get('/credential/:user', (req, res) => {
+  res.json({
+    "credential": payment.isUserProf(parseInt(req.params.user))
+  });
+  res.status(200).end();
 });
 
 function getRemainingMoney(userID) {
