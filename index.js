@@ -118,9 +118,8 @@ app.get('/timer/:stream/:user', (req, res) => {
 
 function getStreamURL(profID) {
   if (existDB(profID)) {
-    let res;
+    let res = "def";
     profStreamDict.forEach(a => {
-      //console.log(a, "and", profID);
       if (a['key'] == profID) {
         console.log(a['key'], "and", profID, "makes", a['value']);
         res = a['value'];
@@ -138,11 +137,11 @@ function getStreamURL(profID) {
 
 app.get('/stream/get/:profID/:userID', (req, res) => {
   var r = getRemainingMoney(req.params.userID)
-
   if (r < STREAMCOST) {
     res.status(402).end();
   }
   let a = getStreamURL(req.params.profID);
+  console.log("ProfID = " + req.params.profID);
   console.log("VAL: " + a);
   if (a == null) {
     res.status(408).end();
@@ -158,7 +157,7 @@ function getRemainingMoney(userID) {
     let remainingMoney = getMoneyFromDB(userID);
     return remainingMoney;
   } else {
-    return S
+    return 42;
   }
 }
 
@@ -290,7 +289,7 @@ io.on('connection', (socket) => {
     getRemainingTime(userID, roomID).then(a => {
 
       let remainingTime = a;
-      //console.log("remaining : " + remainingTime)
+      console.log("remaining : " + remainingTime)
 
       if (remainingTime <= 0) {
         socketList[args['userID'] + "|" + args['roomID']] = new UserStreamEntity(args['userID'], args['roomID'], remainingTime, socket, i => {
@@ -324,6 +323,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (args) => {
+    console.log("RECIEVED MESSAGE");
+    console.log(args);
     socket.to(args['roomID']).emit('recieve message', ({ "msg": args['msg'], "userID": args['userID'], "question": args['question'] }));
   });
 
