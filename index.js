@@ -76,8 +76,6 @@ function timer(callback, delay) {
     }
   }
 
-  }
-
   this.pause = function () {
     running = false
     clearTimeout(id)
