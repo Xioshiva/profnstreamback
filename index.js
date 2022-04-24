@@ -76,7 +76,6 @@ function timer(callback, delay) {
     }
   }
 
-  }
 
   this.pause = function () {
     running = false
@@ -224,6 +223,94 @@ app.get('/credential/:user', (req, res) => {
   });
   res.status(200).end();
 });
+
+app.get('/streams/', (req, res) => {
+  res.json({
+    data:[
+      {
+      id: 1,
+      name: "Les exponentielles",
+      imageURL: "https://d138zd1ktt9iqe.cloudfront.net/media/seo_landing_files/graphing-exponential-functions-example-1-1625243041.png",
+      price: 32,
+      description: 'Radagon',
+      categoryId: 1
+    },
+    {
+      id: 2,
+      name: "Ingenierie software",
+      imageURL: "https://cdn-cashy-static-assets.lucidchart.com/marketing/pages/consideration-page/UML/_new_UML-used-by-developers.png",
+      price: 6,
+      description: 'Rekik',
+      categoryId: 1
+    },
+    {
+      id: 3,
+      name: "Elden Ring",
+      imageURL: "https://static1.thegamerimages.com/wordpress/wp-content/uploads/2022/03/Elden-Ring-rolling-goat-death.jpg?q=50&fit=contain&w=943&h=472&dpr=1.5",
+      price: 54,
+      description: 'Ilias N\'Hairi',
+      categoryId: 0
+    },
+    {
+      id: 4,
+      name: "Perceptron",
+      imageURL: "https://datascientest.com/wp-content/uploads/2021/04/illu_perceptron_blog-138.png",
+      price: 37,
+      description: 'Bologna',
+      categoryId: 2
+    }
+    ]
+  });
+  res.status(200).end();
+});
+
+app.get('/category/', (req, res) => {
+  res.json({
+    data:[
+      {
+        id: 123,
+        categoryName: "Maths",
+        description: "Maths",
+        imageURL: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.kelclass.com%2Fannonces%2Fcours-particuliers%2Fsoutien-scolaire%2Fcours-particulier-en-maths-a-distance-pour-tous-les-niveaux-40545&psig=AOvVaw3sU18EQQZdaZ6gXRgVqBxo&ust=1650897945315000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCMCLnKD4rPcCFQAAAAAdAAAAABAD",
+        products: [
+          {
+            id: 1,
+            name: "Les exponentielles",
+            imageURL: "https://d138zd1ktt9iqe.cloudfront.net/media/seo_landing_files/graphing-exponential-functions-example-1-1625243041.png",
+            price: 32,
+            description: 'Radagon',
+            categoryId: 1
+          },
+          {
+            id: 2,
+            name: "Ingenierie software",
+            imageURL: "https://cdn-cashy-static-assets.lucidchart.com/marketing/pages/consideration-page/UML/_new_UML-used-by-developers.png",
+            price: 6,
+            description: 'Rekik',
+            categoryId: 1
+          },
+          {
+            id: 3,
+            name: "Elden Ring",
+            imageURL: "https://static1.thegamerimages.com/wordpress/wp-content/uploads/2022/03/Elden-Ring-rolling-goat-death.jpg?q=50&fit=contain&w=943&h=472&dpr=1.5",
+            price: 54,
+            description: 'Ilias N\'Hairi',
+            categoryId: 0
+          },
+          {
+            id: 4,
+            name: "Perceptron",
+            imageURL: "https://datascientest.com/wp-content/uploads/2021/04/illu_perceptron_blog-138.png",
+            price: 37,
+            description: 'Bologna',
+            categoryId: 2
+          }]
+      }
+    ]
+  });
+  res.status(200).end();
+});
+
 
 function getRemainingMoney(userID) {
   if (existDB(userID)) {
